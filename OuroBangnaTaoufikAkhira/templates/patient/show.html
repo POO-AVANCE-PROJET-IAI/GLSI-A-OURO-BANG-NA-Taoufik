@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Patient Detail</title>
+  </head>
+  <body>
+    <h1>Patient Detail</h1>
+    <p>First Name: {{ patient.first_name }}</p>
+    <p>Last Name: {{ patient.last_name }}</p>
+    <p>Phone Number: {{ patient.phone_number }}</p>
+    <p>Emergency Number: {{ patient.emergency_number }}</p>
+    <p>Adresse: {{ patient.adresse }}</p>
+    <p>Job: {{ patient.job }}</p>
+    <a href="{% url 'patients.index' %}">Back to List</a>
+  </body>
+</html>
