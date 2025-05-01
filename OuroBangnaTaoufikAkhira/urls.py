@@ -28,4 +28,12 @@ urlpatterns = [
     path("acts/<int:pk>/edit/", views.act_edit, name="acts.edit"),
     path("acts/<int:pk>/update/", views.act_update, name="acts.update"),
     path("acts/<int:pk>/destroy/", views.act_destroy, name="acts.destroy"),
+    # ========== GESTION DES MEDICAMENTS ==========
+    path('medicines/', views.medicine_index, name='medicines.index'),
+    path('medicines/<int:pk>/', views.medicine_show, name='medicines.show'),
+    path('medicines/create/', views.medicine_create, name='medicines.create'),
+    path('medicines/store/', views.medicine_store, name='medicines.store'),
+    path('medicines/<int:pk>/edit/', views.medicine_edit, name='medicines.edit'),
+    path('medicines/<int:pk>/update/', views.medicine_update, name='medicines.update'),
+    path('medicines/<int:pk>/destroy/', views.medicine_destroy, name='medicines.destroy'),
 ]

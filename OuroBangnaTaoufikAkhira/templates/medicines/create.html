@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Medicine</title>
+  </head>
+  <body>
+    <h1>Create Medicine</h1>
+    <form method="post" action="{% url 'medicines.store' %}">
+      {% csrf_token %}
+      <label for="libelle">Libelle:</label>
+      <input type="text" name="libelle" required /><br />
+      <button type="submit">Save</button>
+    </form>
+    <a href="{% url 'medicines.index' %}">Cancel</a>
+  </body>
+</html>

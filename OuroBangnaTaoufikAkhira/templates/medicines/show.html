@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Medicine Detail</title>
+  </head>
+  <body>
+    <h1>Medicine Detail</h1>
+    <p>Code: {{ medicine.code }}</p>
+    <p>Libelle: {{ medicine.libelle }}</p>
+    <a href="{% url 'medicines.index' %}">Back to List</a>
+  </body>
+</html>
