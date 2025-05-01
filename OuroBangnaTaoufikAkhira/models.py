@@ -1,5 +1,10 @@
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta
+
+
+def get_expiry_date():
+    return timezone.now() + timedelta(days=10)
 
 
 class User(models.Model):
@@ -119,9 +124,7 @@ class OrderDelails(models.Model):
 class Consultation(models.Model):
     code = models.CharField(max_length=100, unique=True)
     date = models.DateField(default=timezone.now)
-    expiryDate = models.DateField(
-        default=lambda: timezone.now() + timezone.timedelta(days=10)
-    )
+    expiryDate = models.DateField(default=get_expiry_date)
 
     doctor = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="consultation_doctor"
