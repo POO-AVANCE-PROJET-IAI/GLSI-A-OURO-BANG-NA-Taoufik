@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit Patient</title>
+  </head>
+  <body>
+    <h1>Edit Patient</h1>
+    <form method="post" action="{% url 'patients.update' patient.pk %}">
+      {% csrf_token %}
+      <label for="last_name">Last Name:</label>
+      <input type="text" name="last_name" value="{{ patient.last_name }}" required /><br />
+      <label for="first_name">First Name:</label>
+      <input type="text" name="first_name" value="{{ patient.first_name }}" required /><br />
+      <label for="phone_number">Phone Number:</label>
+      <input type="text" name="phone_number" value="{{ patient.phone_number }}" required /><br />
+      <label for="emergency_number">Emergency Number:</label>
+      <input type="text" name="emergency_number" value="{{ patient.emergency_number }}" required /><br />
+      <label for="adresse">Adresse:</label>
+      <input type="text" name="adresse" value="{{ patient.adresse }}" required /><br />
+      <label for="job">Job:</label>
+      <input type="text" name="job" value="{{ patient.job }}" required /><br />
+      <button type="submit">Save</button>
+    </form>
+    <a href="{% url 'patients.index' %}">Cancel</a>
+    {% if messages %}
+      <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </body>
+</html>
