@@ -1,21 +1,28 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Patient
+from .models import Patient, ActType
 from django.contrib import messages
 
 
 def home(request):
     return render(request, "home.html")
 
+
+# ========================================
+# ============= Patients =================
+# ========================================
 def patient_index(request):
     patients = Patient.objects.all()
     return render(request, "patient/index.html", {"patients": patients})
+
 
 def patient_show(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     return render(request, "patient/show.html", {"patient": patient})
 
+
 def patient_create(request):
     return render(request, "patient/create.html")
+
 
 def patient_store(request):
     if request.method == "POST":
@@ -50,9 +57,11 @@ def patient_store(request):
         )
         return redirect("patients.index")
 
+
 def patient_edit(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     return render(request, "patient/edit.html", {"patient": patient})
+
 
 def patient_update(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
@@ -87,9 +96,69 @@ def patient_update(request, pk):
         patient.save()
         return redirect("patients.index")
 
+
 def patient_destroy(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     patient.delete()
     return redirect("patients.index")
 
 
+# ========================================
+# =========== Types d'actes ==============
+# ========================================
+
+
+def generate_acttype_code():
+    last_acttype = ActType.objects.order_by("id").last()
+    if not last_acttype:
+        return "T-ACT-001"
+    last_code = last_acttype.code
+    code_number = int(last_code.split("-")[-1]) + 1
+    return f"T-ACT-{code_number:03}"
+
+
+def acttype_index(request):
+    acttypes = ActType.objects.all()
+    return render(request, "acttypes/index.html", {"acttypes": acttypes})
+
+
+def acttype_show(request, pk):
+    acttype = get_object_or_404(ActType, pk=pk)
+    return render(request, "acttypes/show.html", {"acttype": acttype})
+
+
+def acttype_create(request):
+    return render(request, "acttypes/create.html")
+
+
+def acttype_store(request):
+    if request.method == "POST":
+        code = generate_acttype_code()
+        libelle = request.POST.get("libelle")
+
+        if ActType.objects.filter(libelle=libelle).exists():
+            messages.error(request, "Ce type d'acte médical existe déjà.")
+            return redirect("acttypes.create")
+
+        ActType.objects.create(code=code, libelle=libelle)
+        return redirect("acttypes.index")
+
+
+def acttype_edit(request, pk):
+    acttype = get_object_or_404(ActType, pk=pk)
+    return render(request, "acttypes/edit.html", {"acttype": acttype})
+
+
+def acttype_update(request, pk):
+    acttype = get_object_or_404(ActType, pk=pk)
+    if request.method == "POST":
+        libelle = request.POST.get("libelle")
+        acttype.libelle = libelle
+        acttype.save()
+        return redirect("acttypes.index")
+
+
+def acttype_destroy(request, pk):
+    acttype = get_object_or_404(ActType, pk=pk)
+    acttype.delete()
+    return redirect("acttypes.index")

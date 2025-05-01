@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit ActType</title>
+  </head>
+  <body>
+    <h1>Edit ActType</h1>
+    <form method="post" action="{% url 'acttypes.update' acttype.pk %}">
+      {% csrf_token %}
+      <label for="libelle">Libelle:</label>
+      <input type="text" name="libelle" value="{{ acttype.libelle }}" required /><br />
+      <button type="submit">Save</button>
+    </form>
+    <a href="{% url 'acttypes.index' %}">Cancel</a>
+  </body>
+</html>
