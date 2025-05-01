@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ActType List</title>
+  </head>
+  <body>
+    <h1>ActType List</h1>
+    <ul>
+      {% for acttype in acttypes %}
+        <li>
+          {{ acttype.libelle }}
+          <a href="{% url 'acttypes.show' acttype.pk %}">Detail</a>
+          <a href="{% url 'acttypes.edit' acttype.pk %}">Edit</a>
+          <a href="#" onclick="confirmDelete({{ acttype.pk }})">Delete</a>
+        </li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'acttypes.create' %}">Add New ActType</a>
+
+    <script>
+      function confirmDelete(acttypeId) {
+        if (confirm('Are you sure you want to delete this act type?')) {
+          window.location.href = '{% url "acttypes.destroy" 0 %}'.replace('0', acttypeId)
+        }
+      }
+    </script>
+  </body>
+</html>
