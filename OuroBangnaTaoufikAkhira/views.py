@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Patient, ActType, Act
+from .models import Patient, ActType, Act, Medicine
 from django.contrib import messages
 
 
@@ -232,7 +232,75 @@ def act_update(request, pk):
         act.save()
         return redirect("acts.index")
 
+
 def act_destroy(request, pk):
     act = get_object_or_404(Act, pk=pk)
     act.delete()
     return redirect("acts.index")
+
+
+# ========================================
+# ============= Medicaments ==============
+# ========================================
+
+
+def generate_medicine_code():
+    last_medicine = Medicine.objects.order_by("id").last()
+    if not last_medicine:
+        return "MDCN-001"
+    last_code = last_medicine.code
+    code_number = int(last_code.split("-")[-1]) + 1
+    return f"MDCN-{code_number:03}"
+
+
+def medicine_index(request):
+    medicines = Medicine.objects.all()
+    return render(request, "medicines/index.html", {"medicines": medicines})
+
+
+def medicine_show(request, pk):
+    medicine = get_object_or_404(Medicine, pk=pk)
+    return render(request, "medicines/show.html", {"medicine": medicine})
+
+
+def medicine_create(request):
+    return render(request, "medicines/create.html")
+
+
+def medicine_store(request):
+    if request.method == "POST":
+        libelle = request.POST.get("libelle")
+
+        if Medicine.objects.filter(libelle=libelle).exists():
+            messages.error(request, "Libelle already exists.")
+            return redirect("medicines.create")
+
+        code = generate_medicine_code()
+
+        Medicine.objects.create(code=code, libelle=libelle)
+        return redirect("medicines.index")
+
+
+def medicine_edit(request, pk):
+    medicine = get_object_or_404(Medicine, pk=pk)
+    return render(request, "medicines/edit.html", {"medicine": medicine})
+
+
+def medicine_update(request, pk):
+    medicine = get_object_or_404(Medicine, pk=pk)
+    if request.method == "POST":
+        libelle = request.POST.get("libelle")
+
+        if Medicine.objects.filter(libelle=libelle).exclude(pk=pk).exists():
+            messages.error(request, "Libelle already exists.")
+            return redirect("medicines.edit", pk=pk)
+
+        medicine.libelle = libelle
+        medicine.save()
+        return redirect("medicines.index")
+
+
+def medicine_destroy(request, pk):
+    medicine = get_object_or_404(Medicine, pk=pk)
+    medicine.delete()
+    return redirect("medicines.index")
