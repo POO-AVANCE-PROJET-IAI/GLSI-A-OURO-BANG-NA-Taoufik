@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Patient, ActType
+from .models import Patient, ActType, Act
 from django.contrib import messages
 
 
@@ -162,3 +162,77 @@ def acttype_destroy(request, pk):
     acttype = get_object_or_404(ActType, pk=pk)
     acttype.delete()
     return redirect("acttypes.index")
+
+
+# ========================================
+# =============== Acts ===================
+# ========================================
+def generate_act_code():
+    last_act = Act.objects.order_by("id").last()
+    if not last_act:
+        return "ACT-001"
+    last_code = last_act.code
+    code_number = int(last_code.split("-")[-1]) + 1
+    return f"ACT-{code_number:03}"
+
+
+def act_index(request):
+    acts = Act.objects.all()
+    return render(request, "acts/index.html", {"acts": acts})
+
+
+def act_show(request, pk):
+    act = get_object_or_404(Act, pk=pk)
+    return render(request, "acts/show.html", {"act": act})
+
+
+def act_create(request):
+    act_types = ActType.objects.all()
+    return render(request, "acts/create.html", {"act_types": act_types})
+
+
+def act_store(request):
+    if request.method == "POST":
+        libelle = request.POST.get("libelle")
+        amount = request.POST.get("amount")
+        act_type_id = request.POST.get("act_type")
+
+        if Act.objects.filter(libelle=libelle).exists():
+            messages.error(request, "Libelle already exists.")
+            return redirect("acts.create")
+
+        code = generate_act_code()
+
+        act_type = get_object_or_404(ActType, pk=act_type_id)
+        Act.objects.create(code=code, libelle=libelle, amount=amount, act_type=act_type)
+        return redirect("acts.index")
+
+
+def act_edit(request, pk):
+    act = get_object_or_404(Act, pk=pk)
+    act_types = ActType.objects.all()
+    return render(request, "acts/edit.html", {"act": act, "act_types": act_types})
+
+
+def act_update(request, pk):
+    act = get_object_or_404(Act, pk=pk)
+    if request.method == "POST":
+        libelle = request.POST.get("libelle")
+        amount = request.POST.get("amount")
+        act_type_id = request.POST.get("act_type")
+
+        if Act.objects.filter(libelle=libelle).exclude(pk=pk).exists():
+            messages.error(request, "Libelle already exists.")
+            return redirect("acts.edit", pk=pk)
+
+        act_type = get_object_or_404(ActType, pk=act_type_id)
+        act.libelle = libelle
+        act.amount = amount
+        act.act_type = act_type
+        act.save()
+        return redirect("acts.index")
+
+def act_destroy(request, pk):
+    act = get_object_or_404(Act, pk=pk)
+    act.delete()
+    return redirect("acts.index")

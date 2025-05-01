@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Act</title>
+  </head>
+  <body>
+    <h1>Create Act</h1>
+    <form method="post" action="{% url 'acts.store' %}">
+      {% csrf_token %}
+      <label for="libelle">Libelle:</label>
+      <input type="text" name="libelle" required /><br />
+      <label for="amount">Amount:</label>
+      <input type="number" name="amount" required /><br />
+      <label for="act_type">Act Type:</label>
+      <select name="act_type" required>
+        <option disabled selected>Veuillez sélectionner un type d'act</option>
+        {% for act_type in act_types %}
+          <option value="{{ act_type.pk }}">{{ act_type.libelle }}</option>
+        {% endfor %}
+      </select><br />
+      <button type="submit">Save</button>
+    </form>
+    <a href="{% url 'acts.index' %}">Cancel</a>
+    {% if messages %}
+      <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </body>
+</html>

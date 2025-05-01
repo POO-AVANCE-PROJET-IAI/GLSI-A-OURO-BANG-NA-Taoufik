@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Act Detail</title>
+  </head>
+  <body>
+    <h1>Act Detail</h1>
+    <p>Code: {{ act.code }}</p>
+    <p>Libelle: {{ act.libelle }}</p>
+    <p>Amount: {{ act.amount }}</p>
+    <p>Act Type: {{ act.act_type.libelle }}</p>
+    <a href="{% url 'acts.index' %}">Back to List</a>
+  </body>
+</html>
