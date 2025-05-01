@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Act List</title>
+</head>
+<body>
+    <h1>Act List</h1>
+    <ul>
+        {% for act in acts %}
+            <li>
+                {{ act.libelle }} - {{ act.code }}
+                <a href="{% url 'acts.show' act.pk %}">Detail</a>
+                <a href="{% url 'acts.edit' act.pk %}">Edit</a>
+                <a href="#" onclick="confirmDelete({{ act.pk }})">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'acts.create' %}">Add New Act</a>
+
+    <script>
+        function confirmDelete(actId) {
+            if (confirm('Are you sure you want to delete this act?')) {
+                window.location.href = '{% url "acts.destroy" 0 %}'.replace('0', actId);
+            }
+        }
+    </script>
+</body>
+</html>

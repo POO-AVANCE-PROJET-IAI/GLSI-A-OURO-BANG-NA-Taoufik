@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Act</title>
+</head>
+<body>
+    <h1>Edit Act</h1>
+    <form method="post" action="{% url 'acts.update' act.pk %}">
+        {% csrf_token %}
+        <label for="libelle">Libelle:</label>
+        <input type="text" name="libelle" value="{{ act.libelle }}" required><br>
+        <label for="amount">Amount:</label>
+        <input type="number" name="amount" value="{{ act.amount }}" required><br>
+        <label for="act_type">Act Type:</label>
+        <select name="act_type" required>
+            {% for act_type in act_types %}
+                <option value="{{ act_type.pk }}" {% if act_type == act.act_type %}selected{% endif %}>{{ act_type.libelle }}</option>
+            {% endfor %}
+        </select><br>
+        <button type="submit">Save</button>
+    </form>
+    <a href="{% url 'acts.index' %}">Cancel</a>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
