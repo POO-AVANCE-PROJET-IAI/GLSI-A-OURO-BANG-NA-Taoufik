@@ -1,10 +1,9 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.hashers import make_password
-from OuroBangnaTaoufikAkhira.models import User
+from django.contrib.auth.models import User
 
 
 class Command(BaseCommand):
-    help = "Créer des utilisataurs"
+    help = "Créer des utilisateurs"
 
     def handle(self, *args, **kwargs):
         users = [
@@ -19,21 +18,22 @@ class Command(BaseCommand):
                 "password": "taoufik2005",
             },
         ]
+
         for user_data in users:
-            user, created = User.objects.get_or_create(
-                username=user_data["username"],
-                defaults={
-                    "email": user_data["email"],
-                    "password": make_password(user_data["password"]),
-                },
-            )
-            if created:
+            if not User.objects.filter(username=user_data["username"]).exists():
+                User.objects.create_user(
+                    username=user_data["username"],
+                    email=user_data["email"],
+                    password=user_data["password"],
+                )
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"L'utilisateur {user.username} a été créé avec succès."
+                        f"L'utilisateur {user_data['username']} a été créé avec succès."
                     )
                 )
             else:
                 self.stdout.write(
-                    self.style.SUCCESS(f"L'utilisateur {user.username} existe déjà.")
+                    self.style.WARNING(
+                        f"L'utilisateur {user_data['username']} existe déjà."
+                    )
                 )

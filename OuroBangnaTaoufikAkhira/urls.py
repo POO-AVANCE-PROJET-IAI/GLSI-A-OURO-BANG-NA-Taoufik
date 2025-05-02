@@ -3,7 +3,11 @@ from . import views
 
 
 urlpatterns = [
-    path("", views.home, name="home"),
+    path("", views.index, name="index"),
+    # ========== AUTHENTIFICATION ==========
+    path("login/", views.login_view, name="login"),
+    path("home/", views.home, name="home"),
+    path('logout/', views.logout_view, name='logout'),
     # ========== GESTION DES PATIENTS ==========
     path("patients/", views.patient_index, name="patients.index"),
     path("patients/<int:pk>/", views.patient_show, name="patients.show"),
@@ -29,11 +33,13 @@ urlpatterns = [
     path("acts/<int:pk>/update/", views.act_update, name="acts.update"),
     path("acts/<int:pk>/destroy/", views.act_destroy, name="acts.destroy"),
     # ========== GESTION DES MEDICAMENTS ==========
-    path('medicines/', views.medicine_index, name='medicines.index'),
-    path('medicines/<int:pk>/', views.medicine_show, name='medicines.show'),
-    path('medicines/create/', views.medicine_create, name='medicines.create'),
-    path('medicines/store/', views.medicine_store, name='medicines.store'),
-    path('medicines/<int:pk>/edit/', views.medicine_edit, name='medicines.edit'),
-    path('medicines/<int:pk>/update/', views.medicine_update, name='medicines.update'),
-    path('medicines/<int:pk>/destroy/', views.medicine_destroy, name='medicines.destroy'),
+    path("medicines/", views.medicine_index, name="medicines.index"),
+    path("medicines/<int:pk>/", views.medicine_show, name="medicines.show"),
+    path("medicines/create/", views.medicine_create, name="medicines.create"),
+    path("medicines/store/", views.medicine_store, name="medicines.store"),
+    path("medicines/<int:pk>/edit/", views.medicine_edit, name="medicines.edit"),
+    path("medicines/<int:pk>/update/", views.medicine_update, name="medicines.update"),
+    path(
+        "medicines/<int:pk>/destroy/", views.medicine_destroy, name="medicines.destroy"
+    ),
 ]
