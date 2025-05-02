@@ -53,6 +53,7 @@ MIDDLEWARE = [
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
+AUTH_USER_MODEL = 'OuroBangnaTaoufikAkhira.User'
 ROOT_URLCONF = "OuroBangnaTaoufik.urls"
 
 TEMPLATES = [

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Consultation Detail</title>
+  </head>
+  <body>
+    <h1>Consultation Detail</h1>
+    <p>Code: {{ consultation.code }}</p>
+    <p>Patient: {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}</p>
+    <p>Doctor: {{ consultation.doctor.username }}</p>
+    <h2>Acts</h2>
+    <ul>
+      {% for detail in details %}
+        <li>{{ detail.act.libelle }} - {{ detail.code }}</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'consultations.index' %}">Back to List</a>
+  </body>
+</html>

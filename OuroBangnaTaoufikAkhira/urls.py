@@ -42,4 +42,9 @@ urlpatterns = [
     path(
         "medicines/<int:pk>/destroy/", views.medicine_destroy, name="medicines.destroy"
     ),
+    # ========== GESTION DES CONSULTATIONS ==========
+    path('consultations/', views.consultation_index, name='consultations.index'),
+    path('consultations/create/', views.consultation_create, name='consultations.create'),
+    path('consultations/<int:pk>/', views.consultation_show, name='consultations.show'),
+    path('consultations/<int:pk>/update/', views.consultation_update, name='consultations.update'),
 ]

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Consultation</title>
+  </head>
+  <body>
+    <h1>Create Consultation</h1>
+    <form method="post">
+      {% csrf_token %}
+      <label for="patient">Patient:</label>
+      <select name="patient" required>
+        {% for patient in patients %}
+          <option value="{{ patient.pk }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+        {% endfor %}
+      </select><br />
+      <label for="act">Act:</label>
+      <select name="act" required>
+        {% for act in acts %}
+          <option value="{{ act.pk }}">{{ act.libelle }}</option>
+        {% endfor %}
+      </select><br />
+      <button type="submit">Create</button>
+    </form>
+    <a href="{% url 'consultations.index' %}">Cancel</a>
+  </body>
+</html>

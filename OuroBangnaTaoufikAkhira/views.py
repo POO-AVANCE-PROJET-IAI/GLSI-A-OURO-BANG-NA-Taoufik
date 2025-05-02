@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Patient, ActType, Act, Medicine
+from .models import Patient, ActType, Act, Medicine, Consultation, ConsultationDetails, User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -28,7 +28,6 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Vérifie si le compte est activé via le champ `status`
             if hasattr(user, "status") and not user.status:
                 messages.error(request, "Votre compte a été désactivé.")
                 return render(request, "auth/login.html")
@@ -343,3 +342,100 @@ def medicine_destroy(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     medicine.delete()
     return redirect("medicines.index")
+
+
+# ========================================
+# =========== Consultations ==============
+# ========================================
+def generate_consultation_code():
+    last_consultation = Consultation.objects.order_by("id").last()
+    if not last_consultation:
+        return "CONSULT-000001"
+    last_code = last_consultation.code
+    code_number = int(last_code.split("-")[-1]) + 1
+    return f"CONSULT-{code_number:06}"
+
+
+def generate_consultation_detail_code():
+    last_detail = ConsultationDetails.objects.order_by("id").last()
+    if not last_detail:
+        return "CONSULT-DETAIL-000001"
+    last_code = last_detail.code
+    code_number = int(last_code.split("-")[-1]) + 1
+    return f"CONSULT-DETAIL-{code_number:06}"
+
+
+@login_required(login_url="login")
+@login_required
+def consultation_create(request):
+    if request.method == 'POST':
+        patient_id = request.POST.get('patient')
+        act_id = request.POST.get('act')
+
+        # Generate unique codes
+        consultation_code = generate_consultation_code()
+        detail_code = generate_consultation_detail_code()
+
+        patient = get_object_or_404(Patient, pk=patient_id)
+        act = get_object_or_404(Act, pk=act_id)
+
+        # Ensure request.user is an instance of your custom User model
+        doctor = get_object_or_404(User, pk=request.user.pk)
+
+        consultation = Consultation.objects.create(
+            code=consultation_code,
+            doctor=doctor, 
+            patient=patient
+        )
+
+        ConsultationDetails.objects.create(
+            code=detail_code,
+            act=act,
+            consultation=consultation
+        )
+
+        return redirect('consultations.index')
+
+    patients = Patient.objects.all()
+    acts = Act.objects.all()
+    return render(request, 'consultations/create.html', {'patients': patients, 'acts': acts})
+
+
+@login_required(login_url="login")
+def consultation_update(request, pk):
+    consultation = get_object_or_404(Consultation, pk=pk)
+    if request.method == "POST":
+        act_id = request.POST.get("act")
+
+        detail_code = generate_consultation_detail_code()
+
+        act = get_object_or_404(Act, pk=act_id)
+
+        ConsultationDetails.objects.create(
+            code=detail_code, act=act, consultation=consultation
+        )
+        return redirect("consultations.index")
+
+    acts = Act.objects.all()
+    return render(
+        request,
+        "consultations/update.html",
+        {"consultation": consultation, "acts": acts},
+    )
+
+
+@login_required(login_url="login")
+def consultation_index(request):
+    consultations = Consultation.objects.all()
+    return render(request, "consultations/index.html", {"consultations": consultations})
+
+
+@login_required(login_url="login")
+def consultation_show(request, pk):
+    consultation = get_object_or_404(Consultation, pk=pk)
+    details = ConsultationDetails.objects.filter(consultation=consultation)
+    return render(
+        request,
+        "consultations/show.html",
+        {"consultation": consultation, "details": details},
+    )
