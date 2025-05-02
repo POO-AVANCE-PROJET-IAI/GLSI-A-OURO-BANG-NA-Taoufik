@@ -7,7 +7,7 @@
   </head>
   <body>
     <div class="container">
-      <h1>Page d'acceuil</h1>
+      <h1>Vous êtes connecté !</h1>
       <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam, iste.</p>
       <ul>
         <li>
@@ -17,6 +17,7 @@
           <a href="/patients/create">Créer un patient</a>
         </li>
       </ul>
+      <button href="{% url 'logout' %}">Logout</button>
     </div>
   </body>
 </html>

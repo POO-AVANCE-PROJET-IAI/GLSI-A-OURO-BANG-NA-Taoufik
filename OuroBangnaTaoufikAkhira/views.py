@@ -1,10 +1,49 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Patient, ActType, Act, Medicine
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 
+def index(request):
+    return render(request, "index.html")
+
+
+# ========================================
+# =============== Login ==================
+# ========================================
+@login_required(login_url="login")
 def home(request):
     return render(request, "home.html")
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # Vérifie si le compte est activé via le champ `status`
+            if hasattr(user, "status") and not user.status:
+                messages.error(request, "Votre compte a été désactivé.")
+                return render(request, "auth/login.html")
+
+            login(request, user)
+            return redirect("home")
+        else:
+            messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
+
+    return render(request, "auth/login.html")
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")
 
 
 # ========================================
