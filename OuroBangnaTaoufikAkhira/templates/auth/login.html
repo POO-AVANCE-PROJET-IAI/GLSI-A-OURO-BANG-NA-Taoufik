@@ -1,24 +1,47 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Login</title>
-  </head>
-  <body>
-    <h1>Login</h1>
-    <form method="post">
+{% extends 'layout/guest.html' %}
+{% load static %}
+{% block title %}
+  Connexion
+{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+
+  <div class="login-form p-8 md:p-10 max-w-md mx-auto">
+    <div class="text-center mb-8">
+      <h1 class="title-text text-4xl font-bold tracking-tight mb-2">Heart Pirates</h1>
+      <h2 class="text-gray-600 text-lg font-medium">Connexion à votre espace</h2>
+      <div class="divider"></div>
+    </div>
+
+    <form method="post" class="space-y-6">
       {% csrf_token %}
-      <label for="username">Username:</label>
-      <input type="text" name="username" required /><br />
-      <label for="password">Password:</label>
-      <input type="password" name="password" required /><br />
-      <button type="submit">Login</button>
+      <div class="space-y-2">
+        <label for="username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+        <input type="text" id="username" name="username" required class="form-input" placeholder="Entrez votre nom d'utilisateur" />
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+        </div>
+        <input type="password" id="password" name="password" required class="form-input" placeholder="Entrez votre mot de passe" />
+      </div>
+
+      <button type="submit" class="login-button">Se connecter</button>
     </form>
-    {% if messages %}
-      <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  </body>
-</html>
+
+    <div class="text-center mt-6">
+      <p class="text-gray-500 text-sm mt-4">Système sécurisé pour les professionnels de santé</p>
+    </div>
+    <div class="text-center mt-6">
+      <a class="text-blue-500 text-sm mt-4 cursor-pointer" href="/">Accéder à la page d'acceuil</a>
+    </div>
+  </div>
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

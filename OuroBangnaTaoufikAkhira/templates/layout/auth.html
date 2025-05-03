@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}
+
+      {% endblock %}
+    </title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+  </head>
+
+  <body>
+    <div class="background-gradient"></div>
+    <div class="subtle-pattern"></div>
+
+    <div class="logo-center">
+      {% include 'components/logo.html' %}
+    </div>
+
+    <nav class="navbar">
+      <div class="flex items-center">
+        <button id="sidebar-toggle" class="toggle-btn mr-4"><i class="ri-menu-line"></i></button>
+        <h1 class="navbar-title text-xl">Heart Pirates</h1>
+      </div>
+      <div class="dropdown">
+        <button id="profile-dropdown" class="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 group">
+          <span class="text-gray-800 font-medium">{{ request.user.email }}</span>
+          <i class="ri-arrow-down-s-line text-blue-600 group-hover:transform group-hover:rotate-180 transition-transform duration-300"></i>
+        </button>
+        <div id="dropdown-menu" class="dropdown-menu">
+          <a href="#" class="dropdown-item">
+            <i class="ri-user-line"></i>
+            <span>Mon profil</span>
+          </a>
+          <div class="divider"></div>
+          <a href="{% url 'logout' %}" class="dropdown-item">
+            <i class="ri-logout-box-line"></i>
+            <span>Déconnexion</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <aside id="sidebar" class="sidebar">
+      <div class="py-4">
+        <a href="{% url 'home' %}" class="sidebar-item active">
+          <div class="sidebar-icon">
+            <i class="ri-dashboard-line"></i>
+          </div>
+          <span class="sidebar-text">Tableau de bord</span>
+        </a>
+        <a href="{% url 'patients.index' %}" class="sidebar-item">
+          <div class="sidebar-icon">
+            <i class="ri-user-heart-line"></i>
+          </div>
+          <span class="sidebar-text">Patients</span>
+        </a>
+        <a href="#" class="sidebar-item">
+          <div class="sidebar-icon">
+            <i class="ri-file-list-3-line"></i>
+          </div>
+          <span class="sidebar-text">Ordonnances</span>
+        </a>
+        <a href="#" class="sidebar-item">
+          <div class="sidebar-icon">
+            <i class="ri-medicine-bottle-line"></i>
+          </div>
+          <span class="sidebar-text">Médicaments</span>
+        </a>
+      </div>
+    </aside>
+
+    <main id="content" class="content-area">
+      {% block content %}
+
+      {% endblock %}
+    </main>
+
+    <script src="{% static 'js/auth.js' %}"></script>
+  </body>
+</html>

@@ -1,13 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Akhira</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Page d'acceuil</h1>
+{% extends 'layout/guest.html' %}
+{% load static %}
+{% block title %}Heart Pirates - Cabinet Médical{% endblock title %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+  <div class="card p-8 md:p-12 max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <h1 class="title-text text-4xl sm:text-5xl font-bold tracking-tight mb-2">Heart Pirates</h1>
+      <h2 class="subtitle-text text-xl font-medium">Cabinet Médical Spécialisé</h2>
+      <div class="divider my-6"></div>
     </div>
-  </body>
-</html>
+
+    <div class="g mb-10 text-center">
+      <p class="text-gray-600 leading-relaxed">Bienvenue dans votre espace médical de haute précision. Notre équipe de spécialistes vous offre des soins d'excellence avec rigueur et professionnalisme.</p>
+    </div>
+
+    <div class="text-center">
+      <a href="/login" class="start-button inline-block bg-gradient-to-r from-[#1a365d] to-[#2b6cb0] text-white font-medium py-3 px-8 rounded-md text-base shadow-md">Accéder à votre espace</a>
+      <p class="text-gray-500 text-sm mt-4">Système sécurisé pour les professionnels de santé</p>
+    </div>
+  </div>
+{% endblock %}
