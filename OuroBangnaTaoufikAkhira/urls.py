@@ -7,7 +7,7 @@ urlpatterns = [
     # ========== AUTHENTIFICATION ==========
     path("login/", views.login_view, name="login"),
     path("home/", views.home, name="home"),
-    path('logout/', views.logout_view, name='logout'),
+    path("logout/", views.logout_view, name="logout"),
     # ========== GESTION DES PATIENTS ==========
     path("patients/", views.patient_index, name="patients.index"),
     path("patients/<int:pk>/", views.patient_show, name="patients.show"),
@@ -43,14 +43,26 @@ urlpatterns = [
         "medicines/<int:pk>/destroy/", views.medicine_destroy, name="medicines.destroy"
     ),
     # ========== GESTION DES CONSULTATIONS ==========
-    path('consultations/', views.consultation_index, name='consultations.index'),
-    path('consultations/create/', views.consultation_create, name='consultations.create'),
-    path('consultations/<int:pk>/', views.consultation_show, name='consultations.show'),
-    path('consultations/<int:pk>/update/', views.consultation_update, name='consultations.update'),
+    path("consultations/", views.consultation_index, name="consultations.index"),
+    path(
+        "consultations/create/", views.consultation_create, name="consultations.create"
+    ),
+    path("consultations/<int:pk>/", views.consultation_show, name="consultations.show"),
+    path(
+        "consultations/<int:pk>/update/",
+        views.consultation_update,
+        name="consultations.update",
+    ),
     # ========== FACTURES ==========
-    path('invoices/', views.invoice_index, name='invoices.index'),
-    path('invoices/create/', views.invoice_create, name='invoices.create'),
-    path('invoices/<int:pk>/', views.invoice_show, name='invoices.show'),
-    path('invoices/<int:pk>/edit/', views.invoice_update, name='invoices.update'),
-    path('invoices/<int:pk>/pdf/', views.invoice_pdf, name='invoices.pdf'),
+    path("invoices/", views.invoice_index, name="invoices.index"),
+    path("invoices/create/", views.invoice_create, name="invoices.create"),
+    path("invoices/<int:pk>/", views.invoice_show, name="invoices.show"),
+    path("invoices/<int:pk>/edit/", views.invoice_update, name="invoices.update"),
+    path("invoices/<int:pk>/pdf/", views.invoice_pdf, name="invoices.pdf"),
+    # ========== ORDONANCES ==========
+    path("orders/", views.order_index, name="orders.index"),
+    path("orders/create/", views.order_create, name="orders.create"),
+    path("orders/<int:pk>/", views.order_show, name="orders.show"),
+    path("orders/<int:pk>/edit/", views.order_update, name="orders.update"),
+    path("orders/<int:pk>/pdf/", views.order_pdf, name="orders.pdf"),
 ]

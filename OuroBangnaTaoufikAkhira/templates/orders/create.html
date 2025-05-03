@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Prescription</title>
+  </head>
+  <body>
+    <h1>Create Prescription</h1>
+    {% if consultations %}
+      <form method="post">
+        {% csrf_token %}
+        <div>
+          <label for="consultation">Select Consultation:</label>
+          <select name="consultation" required>
+            {% for consultation in consultations %}
+              <option value="{{ consultation.pk }}">{{ consultation.code }} - {{ consultation.patient.first_name }} {{ consultation.patient.last_name }} (Expires: {{ consultation.expiryDate }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label for="medicine">Select Medicine:</label>
+          <select name="medicine" required>
+            {% for medicine in medicines %}
+              <option value="{{ medicine.pk }}">{{ medicine.libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label for="dosage">Dosage Instructions:</label>
+          <textarea name="dosage" rows="4" cols="50" required></textarea>
+        </div>
+
+        <button type="submit">Create Prescription</button>
+      </form>
+    {% else %}
+      <p>No valid consultations available for prescriptions.</p>
+    {% endif %}
+    <a href="{% url 'orders.index' %}">Back to Prescriptions</a>
+  </body>
+</html>

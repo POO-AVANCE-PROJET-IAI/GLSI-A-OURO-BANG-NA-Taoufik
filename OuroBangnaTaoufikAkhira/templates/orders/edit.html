@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Add Medicine to Prescription</title>
+  </head>
+  <body>
+    <h1>Add Medicine to Prescription: {{ order.code }}</h1>
+
+    {% if consultation %}
+      <div>
+        <p>
+          <strong>Patient:</strong> {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}
+        </p>
+        <p>
+          <strong>Expires On:</strong> {{ consultation.expiryDate }}
+        </p>
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div>
+        <label for="medicine">Select Medicine:</label>
+        <select name="medicine" required>
+          {% for medicine in medicines %}
+            <option value="{{ medicine.pk }}">{{ medicine.libelle }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label for="dosage">Dosage Instructions:</label>
+        <textarea name="dosage" rows="4" cols="50" required></textarea>
+      </div>
+
+      <button type="submit">Add Medicine</button>
+    </form>
+
+    <a href="{% url 'orders.show' order.pk %}">Cancel</a>
+  </body>
+</html>
