@@ -63,8 +63,8 @@ class Patient(models.Model):
 
 class Invoice(models.Model):
     code = models.CharField(max_length=100, unique=True)
-    date = models.DateField()
-    amount = models.IntegerField
+    date = models.DateField(default=timezone.now)
+    amount = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     status = models.BooleanField(default=False)
 

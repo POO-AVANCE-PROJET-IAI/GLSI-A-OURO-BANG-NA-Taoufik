@@ -1,9 +1,25 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Patient, ActType, Act, Medicine, Consultation, ConsultationDetails, User
+from .models import (
+    Patient,
+    ActType,
+    Act,
+    Medicine,
+    Consultation,
+    ConsultationDetails,
+    User,
+    Invoice,
+    InvoiceDetails,
+)
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.utils import timezone
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from io import BytesIO
 
 
 def index(request):
@@ -368,9 +384,9 @@ def generate_consultation_detail_code():
 @login_required(login_url="login")
 @login_required
 def consultation_create(request):
-    if request.method == 'POST':
-        patient_id = request.POST.get('patient')
-        act_id = request.POST.get('act')
+    if request.method == "POST":
+        patient_id = request.POST.get("patient")
+        act_id = request.POST.get("act")
 
         # Generate unique codes
         consultation_code = generate_consultation_code()
@@ -383,22 +399,20 @@ def consultation_create(request):
         doctor = get_object_or_404(User, pk=request.user.pk)
 
         consultation = Consultation.objects.create(
-            code=consultation_code,
-            doctor=doctor, 
-            patient=patient
+            code=consultation_code, doctor=doctor, patient=patient
         )
 
         ConsultationDetails.objects.create(
-            code=detail_code,
-            act=act,
-            consultation=consultation
+            code=detail_code, act=act, consultation=consultation
         )
 
-        return redirect('consultations.index')
+        return redirect("consultations.index")
 
     patients = Patient.objects.all()
     acts = Act.objects.all()
-    return render(request, 'consultations/create.html', {'patients': patients, 'acts': acts})
+    return render(
+        request, "consultations/create.html", {"patients": patients, "acts": acts}
+    )
 
 
 @login_required(login_url="login")
@@ -439,3 +453,137 @@ def consultation_show(request, pk):
         "consultations/show.html",
         {"consultation": consultation, "details": details},
     )
+
+
+# ========================================
+# =========== Factures ==============
+# ========================================
+def generate_invoice_code():
+    now = timezone.now()
+    year = now.year
+    month = now.month
+    last_invoice = (
+        Invoice.objects.filter(code__startswith=f"FACT-{year}-{month:02d}-")
+        .order_by("code")
+        .last()
+    )
+    if not last_invoice:
+        return f"FACT-{year}-{month:02d}-00001"
+    last_number = int(last_invoice.code.split("-")[-1])
+    new_number = last_number + 1
+    return f"FACT-{year}-{month:02d}-{new_number:05d}"
+
+
+def generate_invoice_detail_code():
+    last_detail = InvoiceDetails.objects.order_by("id").last()
+    if not last_detail:
+        return "FACT-DETAIL-0000001"
+
+    last_code = last_detail.code
+    code_number = int(last_code.split("-")[-1]) + 1
+    return f"FACT-DETAIL-{code_number:07d}"
+
+
+@login_required(login_url="login")
+def invoice_index(request):
+    invoices = Invoice.objects.all()
+    return render(request, "invoices/index.html", {"invoices": invoices})
+
+
+@login_required(login_url="login")
+def invoice_create(request):
+    consultations = Consultation.objects.filter(invoice__isnull=True)
+
+    if request.method == "POST":
+        consultation_id = request.POST.get("consultation")
+        consultation = get_object_or_404(Consultation, pk=consultation_id)
+
+        invoice_code = generate_invoice_code()
+
+        total_amount = 0
+        consultation_details = ConsultationDetails.objects.filter(
+            consultation=consultation
+        )
+
+        invoice = Invoice.objects.create(
+            code=invoice_code,
+            date=timezone.now(),
+            amount=total_amount,
+            user=request.user,
+            status=False,
+        )
+
+        for detail in consultation_details:
+            detail_code = generate_invoice_detail_code()
+            act_amount = detail.act.amount
+            total_amount += act_amount
+
+            InvoiceDetails.objects.create(
+                code=detail_code, invoice=invoice, act=detail.act, amount=act_amount
+            )
+
+        invoice.amount = total_amount
+        invoice.save()
+
+        consultation.invoice = invoice
+        consultation.save()
+
+        return redirect("invoices.index")
+
+    return render(request, "invoices/create.html", {"consultations": consultations})
+
+
+@login_required(login_url="login")
+def invoice_show(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+    details = InvoiceDetails.objects.filter(invoice=invoice)
+    return render(
+        request, "invoices/show.html", {"invoice": invoice, "details": details}
+    )
+
+
+@login_required(login_url="login")
+def invoice_update(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+
+    if request.method == "POST":
+        invoice.status = True
+        invoice.save()
+        return redirect("invoices.show", pk=invoice.pk)
+
+    return render(request, "invoices/edit.html", {"invoice": invoice})
+
+
+@login_required(login_url="login")
+def invoice_pdf(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+    details = InvoiceDetails.objects.filter(invoice=invoice)
+
+    consultation = Consultation.objects.filter(invoice=invoice).first()
+
+    template = get_template("invoices/pdf_template.html")
+    html = template.render(
+        {
+            "invoice": invoice,
+            "details": details,
+            "consultation": consultation,
+        }
+    )
+
+    buffer = BytesIO()
+
+    pisa_status = pisa.CreatePDF(
+        html,
+        dest=buffer,
+    )
+
+    if pisa_status.err:
+        return HttpResponse("We had some errors with code %s" % pisa_status.err)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="invoice_{invoice.code}.pdf"'
+    )
+
+    return response

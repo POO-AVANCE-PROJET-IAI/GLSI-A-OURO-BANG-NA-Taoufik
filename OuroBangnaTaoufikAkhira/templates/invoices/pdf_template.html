@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Invoice {{ invoice.code }}</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 1cm;
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 200px;
+            height: auto;
+        }
+        .invoice-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .invoice-details {
+            margin-bottom: 30px;
+        }
+        .invoice-details div {
+            margin-bottom: 5px;
+        }
+        .patient-info {
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .paid-stamp {
+            position: absolute;
+            top: 200px;
+            right: 50px;
+            transform: rotate(15deg);
+            font-size: 48px;
+            font-weight: bold;
+            color: rgba(0, 128, 0, 0.5);
+            border: 10px solid rgba(0, 128, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+       LOGO
+        <div class="invoice-title">INVOICE</div>
+    </div>
+
+    <div class="invoice-details">
+        <div><strong>Invoice Number:</strong> {{ invoice.code }}</div>
+        <div><strong>Date:</strong> {{ invoice.date }}</div>
+        <div><strong>Status:</strong> {% if invoice.status %}Paid{% else %}Unpaid{% endif %}</div>
+    </div>
+
+    <div class="patient-info">
+        <div><strong>Patient:</strong> {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}</div>
+        <div><strong>Phone:</strong> {{ consultation.patient.phone_number }}</div>
+        <div><strong>Address:</strong> {{ consultation.patient.adresse }}</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in details %}
+            <tr>
+                <td>{{ detail.code }}</td>
+                <td>{{ detail.act.libelle }}</td>
+                <td>{{ detail.amount }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="2" style="text-align: right;">Total</td>
+                <td>{{ invoice.amount }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Thank you for your business!</p>
+        <p>If you have any questions, please contact us at your-email@example.com</p>
+    </div>
+
+    {% if invoice.status %}
+    <div class="paid-stamp">PAID</div>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Invoice Details</title>
+  </head>
+  <body>
+    <h1>Invoice: {{ invoice.code }}</h1>
+    <p>
+      <strong>Date:</strong> {{ invoice.date }}
+    </p>
+    <p>
+      <strong>Total Amount:</strong> {{ invoice.amount }}
+    </p>
+    <p>
+      <strong>Status:</strong> {% if invoice.status %}
+        Paid
+      {% else %}
+        Unpaid
+      {% endif %}
+    </p>
+
+    <h2>Invoice Details</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Act</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detail in details %}
+          <tr>
+            <td>{{ detail.code }}</td>
+            <td>{{ detail.act.libelle }}</td>
+            <td>{{ detail.amount }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div>
+      {% if not invoice.status %}
+        <a href="{% url 'invoices.update' invoice.pk %}">Mark as Paid</a>
+      {% endif %}
+      <a href="{% url 'invoices.pdf' invoice.pk %}">Download PDF</a>
+      <a href="{% url 'invoices.index' %}">Back to Invoices</a>
+    </div>
+  </body>
+</html>

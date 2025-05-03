@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Invoice</title>
+  </head>
+  <body>
+    <h1>Create Invoice</h1>
+    {% if consultations %}
+      <form method="post">
+        {% csrf_token %}
+        <label for="consultation">Select Consultation:</label>
+        <select name="consultation" required>
+          {% for consultation in consultations %}
+            <option value="{{ consultation.pk }}">{{ consultation.code }} - {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Create Invoice</button>
+      </form>
+    {% else %}
+      <p>No consultations available for invoicing.</p>
+    {% endif %}
+    <a href="{% url 'invoices.index' %}">Back to Invoices</a>
+  </body>
+</html>

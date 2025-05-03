@@ -47,4 +47,10 @@ urlpatterns = [
     path('consultations/create/', views.consultation_create, name='consultations.create'),
     path('consultations/<int:pk>/', views.consultation_show, name='consultations.show'),
     path('consultations/<int:pk>/update/', views.consultation_update, name='consultations.update'),
+    # ========== FACTURES ==========
+    path('invoices/', views.invoice_index, name='invoices.index'),
+    path('invoices/create/', views.invoice_create, name='invoices.create'),
+    path('invoices/<int:pk>/', views.invoice_show, name='invoices.show'),
+    path('invoices/<int:pk>/edit/', views.invoice_update, name='invoices.update'),
+    path('invoices/<int:pk>/pdf/', views.invoice_pdf, name='invoices.pdf'),
 ]

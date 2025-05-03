@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Invoices</title>
+  </head>
+  <body>
+    <h1>Invoices</h1>
+    <a href="{% url 'invoices.create' %}">Create New Invoice</a>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in invoices %}
+          <tr>
+            <td>{{ invoice.code }}</td>
+            <td>{{ invoice.date }}</td>
+            <td>{{ invoice.amount }}</td>
+            <td>
+              {% if invoice.status %}
+                Paid
+              {% else %}
+                Unpaid
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'invoices.show' invoice.pk %}">View</a>
+              {% if not invoice.status %}
+                <a href="{% url 'invoices.update' invoice.pk %}">Mark as Paid</a>
+              {% endif %}
+              <a href="{% url 'invoices.pdf' invoice.pk %}">Download PDF</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
