@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Prescriptions</title>
+  </head>
+  <body>
+    <h1>Prescriptions</h1>
+    <a href="{% url 'orders.create' %}">Create New Prescription</a>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+          <tr>
+            <td>{{ order.code }}</td>
+            <td>{{ order.date }}</td>
+            <td>
+              <a href="{% url 'orders.show' order.pk %}">View</a>
+              <a href="{% url 'orders.pdf' order.pk %}">Download PDF</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

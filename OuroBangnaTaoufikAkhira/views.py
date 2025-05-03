@@ -9,6 +9,8 @@ from .models import (
     User,
     Invoice,
     InvoiceDetails,
+    Order,
+    OrderDelails,
 )
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -584,6 +586,162 @@ def invoice_pdf(request, pk):
     response = HttpResponse(buffer, content_type="application/pdf")
     response["Content-Disposition"] = (
         f'attachment; filename="invoice_{invoice.code}.pdf"'
+    )
+
+    return response
+
+
+# ========================================
+# ============= Ordonnance ===============
+# ========================================
+
+
+def generate_order_code():
+    last_order = Order.objects.order_by("id").last()
+    if not last_order:
+        return "ORDER-000001"
+
+    last_code = last_order.code
+    code_number = int(last_code.split("-")[-1]) + 1
+    return f"ORDER-{code_number:06d}"
+
+
+def generate_order_detail_code():
+    last_detail = OrderDelails.objects.order_by("id").last()
+    if not last_detail:
+        return "ORDER-DETAIL-000001"
+
+    last_code = last_detail.code
+    code_number = int(last_code.split("-")[-1]) + 1
+    return f"ORDER-DETAIL-{code_number:06d}"
+
+
+@login_required(login_url="login")
+def order_index(request):
+    orders = Order.objects.all()
+    return render(request, "orders/index.html", {"orders": orders})
+
+
+@login_required(login_url="login")
+def order_create(request):
+    today = timezone.now().date()
+    valid_consultations = Consultation.objects.filter(
+        order__isnull=True, expiryDate__gte=today
+    )
+
+    if request.method == "POST":
+        consultation_id = request.POST.get("consultation")
+        medicine_id = request.POST.get("medicine")
+        dosage = request.POST.get("dosage")
+
+        consultation = get_object_or_404(Consultation, pk=consultation_id)
+        medicine = get_object_or_404(Medicine, pk=medicine_id)
+
+        order_code = generate_order_code()
+
+        order = Order.objects.create(code=order_code, date=timezone.now())
+
+        detail_code = generate_order_detail_code()
+        OrderDelails.objects.create(
+            code=detail_code, dosage=dosage, order=order, medicine=medicine
+        )
+
+        consultation.order = order
+        consultation.save()
+
+        return redirect("orders.show", pk=order.pk)
+
+    medicines = Medicine.objects.all()
+    return render(
+        request,
+        "orders/create.html",
+        {"consultations": valid_consultations, "medicines": medicines},
+    )
+
+
+@login_required(login_url="login")
+def order_show(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    details = OrderDelails.objects.filter(order=order)
+    consultation = Consultation.objects.filter(order=order).first()
+
+    today = timezone.now().date()
+    can_edit = consultation and consultation.expiryDate >= today
+
+    return render(
+        request,
+        "orders/show.html",
+        {
+            "order": order,
+            "details": details,
+            "consultation": consultation,
+            "can_edit": can_edit,
+        },
+    )
+
+
+@login_required(login_url="login")
+def order_update(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    consultation = Consultation.objects.filter(order=order).first()
+
+    today = timezone.now().date()
+    if not consultation or consultation.expiryDate < today:
+        messages.error(
+            request, "This prescription can no longer be edited as it has expired."
+        )
+        return redirect("orders.show", pk=order.pk)
+
+    if request.method == "POST":
+        medicine_id = request.POST.get("medicine")
+        dosage = request.POST.get("dosage")
+
+        medicine = get_object_or_404(Medicine, pk=medicine_id)
+
+        detail_code = generate_order_detail_code()
+        OrderDelails.objects.create(
+            code=detail_code, dosage=dosage, order=order, medicine=medicine
+        )
+
+        return redirect("orders.show", pk=order.pk)
+
+    medicines = Medicine.objects.all()
+    return render(
+        request,
+        "orders/edit.html",
+        {"order": order, "medicines": medicines, "consultation": consultation},
+    )
+
+
+@login_required(login_url="login")
+def order_pdf(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    details = OrderDelails.objects.filter(order=order)
+    consultation = Consultation.objects.filter(order=order).first()
+
+    template = get_template("orders/pdf_template.html")
+    html = template.render(
+        {
+            "order": order,
+            "details": details,
+            "consultation": consultation,
+        }
+    )
+
+    buffer = BytesIO()
+
+    pisa_status = pisa.CreatePDF(
+        html,
+        dest=buffer,
+    )
+
+    if pisa_status.err:
+        return HttpResponse("We had some errors with code %s" % pisa_status.err)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="prescription_{order.code}.pdf"'
     )
 
     return response

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Prescription {{ order.code }}</title>
+    <style>
+      @page {
+        size: a4 portrait;
+        margin: 1cm;
+      }
+      body {
+        font-family: Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .logo {
+        max-width: 200px;
+        height: auto;
+      }
+      .title {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+      .details {
+        margin-bottom: 30px;
+      }
+      .details div {
+        margin-bottom: 5px;
+      }
+      .patient-info {
+        margin-bottom: 30px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+      .footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 12px;
+        color: #777;
+      }
+      .signature {
+        margin-top: 50px;
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <!-- Replace with your actual logo path -->
+      <img src="{{ STATIC_URL }}images/logo.png" alt="Company Logo" class="logo" />
+      <div class="title">PRESCRIPTION</div>
+    </div>
+
+    <div class="details">
+      <div>
+        <strong>Prescription Number:</strong> {{ order.code }}
+      </div>
+      <div>
+        <strong>Date:</strong> {{ order.date }}
+      </div>
+    </div>
+
+    {% if consultation %}
+      <div class="patient-info">
+        <div>
+          <strong>Patient:</strong> {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}
+        </div>
+        <div>
+          <strong>Phone:</strong> {{ consultation.patient.phone_number }}
+        </div>
+        <div>
+          <strong>Address:</strong> {{ consultation.patient.adresse }}
+        </div>
+        <div>
+          <strong>Doctor:</strong> {{ consultation.doctor.username }}
+        </div>
+      </div>
+    {% endif %}
+
+    <h2>Prescribed Medicines</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Medicine</th>
+          <th>Dosage Instructions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detail in details %}
+          <tr>
+            <td>{{ detail.medicine.libelle }}</td>
+            <td>{{ detail.dosage }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="signature">
+      <p>Doctor's Signature</p>
+      <br /><br /><br />
+      <p>_______________________</p>
+      {% if consultation %}
+        <p>{{ consultation.doctor.username }}</p>
+      {% endif %}
+    </div>
+
+    <div class="footer">
+      <p>This prescription is valid until {{ consultation.expiryDate }}</p>
+      <p>If you have any questions, please contact us at your-email@example.com</p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Prescription Details</title>
+  </head>
+  <body>
+    <h1>Prescription: {{ order.code }}</h1>
+    <p>
+      <strong>Date:</strong> {{ order.date }}
+    </p>
+
+    {% if consultation %}
+      <div>
+        <h2>Consultation Information</h2>
+        <p>
+          <strong>Patient:</strong> {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}
+        </p>
+        <p>
+          <strong>Doctor:</strong> {{ consultation.doctor.username }}
+        </p>
+        <p>
+          <strong>Consultation Date:</strong> {{ consultation.date }}
+        </p>
+        <p>
+          <strong>Expires On:</strong> {{ consultation.expiryDate }}
+        </p>
+      </div>
+    {% endif %}
+
+    <h2>Prescribed Medicines</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Medicine</th>
+          <th>Dosage Instructions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detail in details %}
+          <tr>
+            <td>{{ detail.medicine.libelle }}</td>
+            <td>{{ detail.dosage }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div>
+      {% if can_edit %}
+        <a href="{% url 'orders.update' order.pk %}">Add Medicine</a>
+      {% endif %}
+      <a href="{% url 'orders.pdf' order.pk %}">Download PDF</a>
+      <a href="{% url 'orders.index' %}">Back to Prescriptions</a>
+    </div>
+  </body>
+</html>
