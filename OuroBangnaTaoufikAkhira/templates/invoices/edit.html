@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mark Invoice as Paid</title>
+  </head>
+  <body>
+    <h1>Mark Invoice as Paid</h1>
+    <p>Are you sure you want to mark invoice {{ invoice.code }} as paid?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit">Yes, Mark as Paid</button>
+    </form>
+    <a href="{% url 'invoices.show' invoice.pk %}">Cancel</a>
+  </body>
+</html>
