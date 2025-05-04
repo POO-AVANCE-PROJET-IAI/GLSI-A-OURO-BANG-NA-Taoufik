@@ -384,7 +384,6 @@ def generate_consultation_detail_code():
 
 
 @login_required(login_url="login")
-@login_required
 def consultation_create(request):
     if request.method == "POST":
         patient_id = request.POST.get("patient")

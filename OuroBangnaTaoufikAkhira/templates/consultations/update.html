@@ -1,20 +1,57 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Update Consultation</title>
-  </head>
-  <body>
-    <h1>Update Consultation</h1>
-    <form method="post">
+{% extends 'layout/auth.html' %}
+{% load static %}
+{% block title %}
+  Modifier une consultation
+{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+
+  <div class="login-form p-8 md:p-10 mx-[200px]">
+    <div class="text-center mb-8">
+      <h2 class="text-gray-600 text-lg font-medium">Ajouter un acte à une consultation</h2>
+      <div class="divider"></div>
+      <a class="text-blue-500 text-sm mt-4 cursor-pointer" href="{% url 'consultations.index' %}">Retour à la liste des consultations</a>
+    </div>
+
+    <form method="post" class="space-y-6">
       {% csrf_token %}
-      <label for="act">Add Act:</label>
-      <select name="act" required>
-        {% for act in acts %}
-          <option value="{{ act.pk }}">{{ act.libelle }}</option>
-        {% endfor %}
-      </select><br />
-      <button type="submit">Add Act</button>
+
+      <div class="space-y-2">
+        <select name="act" id="act" required class="form-input">
+          <option selected disabled>Ajouter un acte médical</option>
+          {% for act in acts %}
+            <option value="{{ act.pk }}">{{ act.libelle }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="login-button">Ajouter l'acte</button>
+
+      {% if messages %}
+        <div class="space-y-2 mt-4">
+          {% for message in messages %}
+            <div class="px-4 py-2 rounded-lg text-sm font-medium
+              {% if message.tags == 'success' %}
+                
+                bg-green-100 text-green-800
+
+              {% elif message.tags == 'error' %}
+                
+                bg-red-100 text-red-800
+
+              {% elif message.tags == 'warning' %}
+                
+                bg-yellow-100 text-yellow-800
+
+              {% else %}
+                
+                bg-blue-100 text-blue-800
+
+              {% endif %}
+            ">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
     </form>
-    <a href="{% url 'consultations.index' %}">Cancel</a>
-  </body>
-</html>
+  </div>
+{% endblock %}

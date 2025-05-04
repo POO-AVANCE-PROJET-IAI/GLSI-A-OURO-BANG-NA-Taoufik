@@ -1,56 +1,118 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Prescription Details</title>
-  </head>
-  <body>
-    <h1>Prescription: {{ order.code }}</h1>
-    <p>
-      <strong>Date:</strong> {{ order.date }}
-    </p>
-
-    {% if consultation %}
-      <div>
-        <h2>Consultation Information</h2>
-        <p>
-          <strong>Patient:</strong> {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}
-        </p>
-        <p>
-          <strong>Doctor:</strong> {{ consultation.doctor.username }}
-        </p>
-        <p>
-          <strong>Consultation Date:</strong> {{ consultation.date }}
-        </p>
-        <p>
-          <strong>Expires On:</strong> {{ consultation.expiryDate }}
-        </p>
+{% extends 'layout/auth.html' %}
+{% load static %}
+{% block title %}
+  Détail de la prescription
+{% endblock %}
+{% block content %}
+  <div class="container mx-auto px-4 py-6">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header avec gradient -->
+      <div class="relative overflow-hidden rounded-t-xl bg-gradient-to-r from-gray-700 to-gray-800 p-6">
+        <div class="absolute inset-0 opacity-10">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="w-full h-full">
+            <path d="M0 0h4v4H0V0zm4 4h4v4H4V4zm4-4h4v4H8V0zm8 0h4v4h-4V0zm4 4h4v4h-4V4zm-4 4h4v4h-4V8zm8-8h4v4h-4V0zm0 8h4v4h-4V8zM0 8h4v4H0V8zm16 0h4v4h-4V8zM0 16h4v4H0v-4zm4 4h4v4H4v-4zm4-4h4v4H8v-4zm8 0h4v4h-4v-4zm4 4h4v4h-4v-4zm-4 4h4v4h-4v-4zm8-8h4v4h-4v-4zm0 8h4v4h-4v-4zM0 24h4v4H0v-4zm16 0h4v4h-4v-4z" fill="currentColor" />
+          </svg>
+        </div>
+        <div class="flex items-center">
+          <div class="h-16 w-16 rounded-full bg-white flex items-center justify-center shadow-md">
+            <span class="text-xl font-bold text-gray-700">{{ order.code|slice:':2'|upper }}</span>
+          </div>
+          <div class="ml-4">
+            <h1 class="text-2xl font-bold text-white">Prescription : {{ order.code }}</h1>
+            <p class="text-gray-200 text-sm">Date : {{ order.date }}</p>
+          </div>
+        </div>
       </div>
-    {% endif %}
 
-    <h2>Prescribed Medicines</h2>
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Medicine</th>
-          <th>Dosage Instructions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for detail in details %}
-          <tr>
-            <td>{{ detail.medicine.libelle }}</td>
-            <td>{{ detail.dosage }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+      <!-- Informations consultation -->
+      {% if consultation %}
+        <div class="bg-white border border-gray-200 rounded-b-xl p-6 space-y-6">
+          <div class="grid gap-4">
+            <div class="flex items-start bg-gray-50 p-4 rounded-lg">
+              <div class="h-10 w-10 flex items-center justify-center bg-gray-200 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A4 4 0 116.5 15h11a4 4 0 010 8h-6" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Patient</p>
+                <p class="text-base text-gray-800">{{ consultation.patient.first_name }} {{ consultation.patient.last_name }}</p>
+              </div>
+            </div>
 
-    <div>
-      {% if can_edit %}
-        <a href="{% url 'orders.update' order.pk %}">Add Medicine</a>
+            <div class="flex items-start bg-gray-50 p-4 rounded-lg">
+              <div class="h-10 w-10 flex items-center justify-center bg-gray-200 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Médecin</p>
+                <p class="text-base text-gray-800">{{ consultation.doctor.username }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-start bg-gray-50 p-4 rounded-lg">
+              <div class="h-10 w-10 flex items-center justify-center bg-gray-200 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10m-7 4h4m-9 4h14" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Consultation</p>
+                <p class="text-base text-gray-800">Le {{ consultation.date }} - Expire : {{ consultation.expiryDate }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       {% endif %}
-      <a href="{% url 'orders.pdf' order.pk %}">Download PDF</a>
-      <a href="{% url 'orders.index' %}">Back to Prescriptions</a>
+
+      <!-- Médicaments prescrits -->
+      <div class="mt-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Médicaments prescrits</h2>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm text-gray-800">
+              <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                <tr>
+                  <th class="px-6 py-3 text-left border-b border-gray-200">Médicament</th>
+                  <th class="px-6 py-3 text-left border-b border-gray-200">Posologie</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for detail in details %}
+                  <tr class="border-t border-gray-100 hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">{{ detail.medicine.libelle }}</td>
+                    <td class="px-6 py-4">{{ detail.dosage }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="2" class="px-6 py-4 text-center text-gray-500">Aucun médicament prescrit.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 mt-6">
+        <a href="{% url 'orders.update' order.pk %}" class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>Ajouter un médicament
+        </a>
+        <a href="{% url 'orders.pdf' order.pk %}" class="flex-1 inline-flex justify-center items-center px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm text-sm font-medium transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>Télécharger PDF
+        </a>
+      </div>
+
+      <a href="{% url 'orders.index' %}" class="inline-flex items-center mt-8 text-gray-600 hover:text-gray-900 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>Retour à la liste
+      </a>
     </div>
-  </body>
-</html>
+  </div>
+{% endblock %}

@@ -1,28 +1,112 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>ActType List</title>
-  </head>
-  <body>
-    <h1>ActType List</h1>
-    <ul>
-      {% for acttype in acttypes %}
-        <li>
-          {{ acttype.libelle }}
-          <a href="{% url 'acttypes.show' acttype.pk %}">Detail</a>
-          <a href="{% url 'acttypes.edit' acttype.pk %}">Edit</a>
-          <a href="#" onclick="confirmDelete({{ acttype.pk }})">Delete</a>
-        </li>
-      {% endfor %}
-    </ul>
-    <a href="{% url 'acttypes.create' %}">Add New ActType</a>
+{% extends 'layout/auth.html' %}
+{% load static %}
+{% block title %}
+  Liste des types actes médicaux
+{% endblock %}
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="relative overflow-hidden rounded-xl mb-8">
+      <div class="absolute inset-0 bg-gradient-to-r from-gray-100 to-blue-50 opacity-70"></div>
+      <div class="absolute inset-0 backdrop-blur-sm"></div>
 
-    <script>
-      function confirmDelete(acttypeId) {
-        if (confirm('Are you sure you want to delete this act type?')) {
-          window.location.href = '{% url "acttypes.destroy" 0 %}'.replace('0', acttypeId)
-        }
+      <div class="relative p-6 z-10">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <h1 class="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+            <span class="flex items-center">
+              <i class="ri-stethoscope-line"></i>
+              Liste des types actes médicaux
+            </span>
+          </h1>
+
+          <div class="w-full md:w-auto flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input type="text" id="actSearch" class="bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 placeholder-gray-500 text-sm rounded-full focus:ring-gray-400 focus:border-gray-400 block w-full pl-10 p-2.5 transition-all duration-300 shadow-sm" placeholder="Rechercher..." />
+            </div>
+
+            <a href="{% url 'acttypes.create' %}" class="bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 font-medium py-2.5 px-5 rounded-full transition-all duration-300 shadow-sm hover:shadow flex items-center justify-center group">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-600 group-hover:text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              <span>Nouveau type d'acte</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Libellé</th>
+              <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200" id="actTableBody">
+            {% for acttype in acttypes %}
+              <tr class="act-row hover:bg-blue-50 transition-colors duration-150">
+                <td class="px-6 py-4 text-sm text-gray-800">{{ acttype.code }}</td>
+                <td class="px-6 py-4 text-sm text-gray-800 act-name">{{ acttype.libelle }}</td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex justify-end space-x-3">
+                    <a href="{% url 'acttypes.show' acttype.pk %}" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg flex items-center">
+                      <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>Voir
+                    </a>
+                    <a href="{% url 'acttypes.edit' acttype.pk %}" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg flex items-center">
+                      <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>Modifier
+                    </a>
+                    <a href="#" onclick="confirmDelete({{ acttype.pk }})" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg flex items-center">Supprimer</a>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="px-6 py-10 text-center text-gray-500">
+                  Aucun acte trouvé. <br />
+                  <a href="{% url 'acttypes.create' %}" class="text-blue-600 hover:underline mt-2 inline-block">Ajouter un acte médical</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function confirmDelete(acttypeId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cet acte médical ?')) {
+        window.location.href = '{% url "acttypes.destroy" 0 %}'.replace('0', acttypeId)
       }
-    </script>
-  </body>
-</html>
+    }
+    
+    const actSearch = document.getElementById('actSearch')
+    let searchTimeout
+    
+    actSearch.addEventListener('input', function () {
+      clearTimeout(searchTimeout)
+    
+      searchTimeout = setTimeout(() => {
+        const searchValue = this.value.toLowerCase()
+        const rows = document.querySelectorAll('.act-row')
+    
+        rows.forEach((row) => {
+          const name = row.querySelector('.act-name').textContent.toLowerCase()
+          row.style.display = name.includes(searchValue) ? '' : 'none'
+        })
+      }, 300)
+    })
+  </script>
+{% endblock %}

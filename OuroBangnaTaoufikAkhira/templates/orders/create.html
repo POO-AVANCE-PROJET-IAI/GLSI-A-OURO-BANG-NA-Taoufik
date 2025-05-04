@@ -1,25 +1,37 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Create Prescription</title>
-  </head>
-  <body>
-    <h1>Create Prescription</h1>
+{% extends 'layout/auth.html' %}
+{% load static %}
+{% block title %}
+  Nouvelle ordonnance
+{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+
+  <div class="login-form p-8 md:p-10 mx-[200px]">
+    <div class="text-center mb-6">
+      <h2 class="text-gray-600 text-lg font-medium">Créer une ordonnance</h2>
+      <div class="divider"></div>
+    </div>
+
     {% if consultations %}
-      <form method="post">
+      <form method="post" class="space-y-6">
         {% csrf_token %}
+
         <div>
-          <label for="consultation">Select Consultation:</label>
-          <select name="consultation" required>
+          <label for="consultation" class="block text-sm font-medium text-gray-700 mb-1">Consultation</label>
+          <select name="consultation" id="consultation" required class="form-input w-full">
+            <option selected disabled>Sélectionner une consultation</option>
             {% for consultation in consultations %}
-              <option value="{{ consultation.pk }}">{{ consultation.code }} - {{ consultation.patient.first_name }} {{ consultation.patient.last_name }} (Expires: {{ consultation.expiryDate }})</option>
+              <option value="{{ consultation.pk }}">
+                {{ consultation.code }} - {{ consultation.patient.first_name }} {{ consultation.patient.last_name }} (Expire le {{ consultation.expiryDate }})
+              </option>
             {% endfor %}
           </select>
         </div>
 
         <div>
-          <label for="medicine">Select Medicine:</label>
-          <select name="medicine" required>
+          <label for="medicine" class="block text-sm font-medium text-gray-700 mb-1">Médicament</label>
+          <select name="medicine" id="medicine" required class="form-input w-full">
+            <option selected disabled>Sélectionner un médicament</option>
             {% for medicine in medicines %}
               <option value="{{ medicine.pk }}">{{ medicine.libelle }}</option>
             {% endfor %}
@@ -27,15 +39,18 @@
         </div>
 
         <div>
-          <label for="dosage">Dosage Instructions:</label>
-          <textarea name="dosage" rows="4" cols="50" required></textarea>
+          <label for="dosage" class="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
+          <textarea name="dosage" id="dosage" rows="4" required class="form-input w-full" placeholder="Exemple : 1 comprimé matin et soir pendant 5 jours"></textarea>
         </div>
 
-        <button type="submit">Create Prescription</button>
+        <button type="submit" class="w-full login-button">Créer l'ordonnance</button>
       </form>
     {% else %}
-      <p>No valid consultations available for prescriptions.</p>
+      <p class="text-center text-sm text-gray-600">Aucune consultation valide disponible pour une ordonnance.</p>
     {% endif %}
-    <a href="{% url 'orders.index' %}">Back to Prescriptions</a>
-  </body>
-</html>
+
+    <div class="mt-6 text-center">
+      <a href="{% url 'orders.index' %}" class="text-blue-500 hover:underline text-sm">Retour aux ordonnances</a>
+    </div>
+  </div>
+{% endblock %}

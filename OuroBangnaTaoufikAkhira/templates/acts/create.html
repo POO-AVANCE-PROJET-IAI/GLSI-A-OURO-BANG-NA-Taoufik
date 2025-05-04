@@ -1,32 +1,59 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Create Act</title>
-  </head>
-  <body>
-    <h1>Create Act</h1>
-    <form method="post" action="{% url 'acts.store' %}">
+{% extends 'layout/auth.html' %}
+{% load static %}
+{% block title %}
+  Créer un acte médical
+{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+
+  <div class="login-form p-8 md:p-10 mx-[200px]">
+    <div class="text-center mb-8">
+      <h2 class="text-gray-600 text-lg font-medium">Créer un acte médical</h2>
+      <div class="divider"></div>
+      <a class="text-blue-500 text-sm mt-4 cursor-pointer" href="{% url 'acts.index' %}">Liste des actes médicaux</a>
+    </div>
+
+    <form method="post" class="space-y-6" action="{% url 'acts.store' %}">
       {% csrf_token %}
-      <label for="libelle">Libelle:</label>
-      <input type="text" name="libelle" required /><br />
-      <label for="amount">Amount:</label>
-      <input type="number" name="amount" required /><br />
-      <label for="act_type">Act Type:</label>
-      <select name="act_type" required>
-        <option disabled selected>Veuillez sélectionner un type d'act</option>
-        {% for act_type in act_types %}
-          <option value="{{ act_type.pk }}">{{ act_type.libelle }}</option>
-        {% endfor %}
-      </select><br />
-      <button type="submit">Save</button>
+
+      <div class="space-y-2">
+        <input type="text" name="libelle" required class="form-input" placeholder="Libellé de l’acte médical" />
+      </div>
+
+      <div class="space-y-2">
+        <input type="number" name="amount" required class="form-input" placeholder="Montant (en FCFA)" />
+      </div>
+
+      <div class="space-y-2">
+        <select name="act_type" required class="form-input">
+          <option disabled selected>Veuillez sélectionner un type d'acte</option>
+          {% for act_type in act_types %}
+            <option value="{{ act_type.pk }}">{{ act_type.libelle }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="login-button">Valider</button>
+
+      {% if messages %}
+        <div class="space-y-2 mt-4">
+          {% for message in messages %}
+            <div class="px-4 py-2 rounded-lg text-sm font-medium
+                {% if message.tags == 'success' %}
+                  bg-green-100 text-green-800
+                {% elif message.tags == 'error' %}
+                  bg-red-100 text-red-800
+                {% elif message.tags == 'warning' %}
+                  bg-yellow-100 text-yellow-800
+                {% else %}
+                  bg-blue-100 text-blue-800
+                {% endif %}
+              ">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
     </form>
-    <a href="{% url 'acts.index' %}">Cancel</a>
-    {% if messages %}
-      <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  </body>
-</html>
+  </div>
+{% endblock %}
