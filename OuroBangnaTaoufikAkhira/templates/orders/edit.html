@@ -1,27 +1,30 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Add Medicine to Prescription</title>
-  </head>
-  <body>
-    <h1>Add Medicine to Prescription: {{ order.code }}</h1>
+{% extends 'layout/auth.html' %}
+{% load static %}
+{% block title %}
+  Ajouter un médicament
+{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+
+  <div class="login-form p-8 md:p-10 mx-[200px]">
+    <div class="text-center mb-6">
+      <h2 class="text-gray-600 text-lg font-medium">Ajouter un médicament à l'ordonnance {{ order.code }}</h2>
+      <div class="divider"></div>
+    </div>
 
     {% if consultation %}
-      <div>
-        <p>
-          <strong>Patient:</strong> {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}
-        </p>
-        <p>
-          <strong>Expires On:</strong> {{ consultation.expiryDate }}
-        </p>
+      <div class="bg-gray-100 rounded-lg p-4 mb-6">
+        <p><strong>Patient :</strong> {{ consultation.patient.first_name }} {{ consultation.patient.last_name }}</p>
+        <p><strong>Expire le :</strong> {{ consultation.expiryDate }}</p>
       </div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" class="space-y-6">
       {% csrf_token %}
+
       <div>
-        <label for="medicine">Select Medicine:</label>
-        <select name="medicine" required>
+        <label for="medicine" class="block text-sm font-medium text-gray-700 mb-1">Médicament</label>
+        <select name="medicine" id="medicine" required class="form-input w-full">
           {% for medicine in medicines %}
             <option value="{{ medicine.pk }}">{{ medicine.libelle }}</option>
           {% endfor %}
@@ -29,13 +32,15 @@
       </div>
 
       <div>
-        <label for="dosage">Dosage Instructions:</label>
-        <textarea name="dosage" rows="4" cols="50" required></textarea>
+        <label for="dosage" class="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
+        <textarea name="dosage" id="dosage" rows="4" required class="form-input w-full" placeholder="Exemple : 1 comprimé le matin et le soir pendant 5 jours"></textarea>
       </div>
 
-      <button type="submit">Add Medicine</button>
+      <button type="submit" class="w-full login-button">Ajouter à l'ordonnance</button>
     </form>
 
-    <a href="{% url 'orders.show' order.pk %}">Cancel</a>
-  </body>
-</html>
+    <div class="mt-6 text-center">
+      <a href="{% url 'orders.show' order.pk %}" class="text-blue-500 hover:underline text-sm">Annuler et retourner à l'ordonnance</a>
+    </div>
+  </div>
+{% endblock %}
