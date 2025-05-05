@@ -103,7 +103,7 @@ def login_view(request):
 
     return render(request, "auth/login.html")
 
-
+@login_required(login_url="login")
 def logout_view(request):
     logout(request)
     return redirect("login")
@@ -112,20 +112,21 @@ def logout_view(request):
 # ========================================
 # ============= Patients =================
 # ========================================
+@login_required(login_url="login")
 def patient_index(request):
     patients = Patient.objects.all()
     return render(request, "patient/index.html", {"patients": patients})
 
-
+@login_required(login_url="login")
 def patient_show(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     return render(request, "patient/show.html", {"patient": patient})
 
-
+@login_required(login_url="login")
 def patient_create(request):
     return render(request, "patient/create.html")
 
-
+@login_required(login_url="login")
 def patient_store(request):
     if request.method == "POST":
         last_name = request.POST.get("last_name")
@@ -159,12 +160,12 @@ def patient_store(request):
         )
         return redirect("patients.index")
 
-
+@login_required(login_url="login")
 def patient_edit(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     return render(request, "patient/edit.html", {"patient": patient})
 
-
+@login_required(login_url="login")
 def patient_update(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
@@ -198,7 +199,7 @@ def patient_update(request, pk):
         patient.save()
         return redirect("patients.index")
 
-
+@login_required(login_url="login")
 def patient_destroy(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     patient.delete()
@@ -218,21 +219,21 @@ def generate_acttype_code():
     code_number = int(last_code.split("-")[-1]) + 1
     return f"T-ACT-{code_number:03}"
 
-
+@login_required(login_url="login")
 def acttype_index(request):
     acttypes = ActType.objects.all()
     return render(request, "acttypes/index.html", {"acttypes": acttypes})
 
-
+@login_required(login_url="login")
 def acttype_show(request, pk):
     acttype = get_object_or_404(ActType, pk=pk)
     return render(request, "acttypes/show.html", {"acttype": acttype})
 
-
+@login_required(login_url="login")
 def acttype_create(request):
     return render(request, "acttypes/create.html")
 
-
+@login_required(login_url="login")
 def acttype_store(request):
     if request.method == "POST":
         code = generate_acttype_code()
@@ -245,12 +246,12 @@ def acttype_store(request):
         ActType.objects.create(code=code, libelle=libelle)
         return redirect("acttypes.index")
 
-
+@login_required(login_url="login")
 def acttype_edit(request, pk):
     acttype = get_object_or_404(ActType, pk=pk)
     return render(request, "acttypes/edit.html", {"acttype": acttype})
 
-
+@login_required(login_url="login")
 def acttype_update(request, pk):
     acttype = get_object_or_404(ActType, pk=pk)
     if request.method == "POST":
@@ -259,7 +260,7 @@ def acttype_update(request, pk):
         acttype.save()
         return redirect("acttypes.index")
 
-
+@login_required(login_url="login")
 def acttype_destroy(request, pk):
     acttype = get_object_or_404(ActType, pk=pk)
     acttype.delete()
@@ -277,22 +278,22 @@ def generate_act_code():
     code_number = int(last_code.split("-")[-1]) + 1
     return f"ACT-{code_number:03}"
 
-
+@login_required(login_url="login")
 def act_index(request):
     acts = Act.objects.all()
     return render(request, "acts/index.html", {"acts": acts})
 
-
+@login_required(login_url="login")
 def act_show(request, pk):
     act = get_object_or_404(Act, pk=pk)
     return render(request, "acts/show.html", {"act": act})
 
-
+@login_required(login_url="login")
 def act_create(request):
     act_types = ActType.objects.all()
     return render(request, "acts/create.html", {"act_types": act_types})
 
-
+@login_required(login_url="login")
 def act_store(request):
     if request.method == "POST":
         libelle = request.POST.get("libelle")
@@ -309,13 +310,13 @@ def act_store(request):
         Act.objects.create(code=code, libelle=libelle, amount=amount, act_type=act_type)
         return redirect("acts.index")
 
-
+@login_required(login_url="login")
 def act_edit(request, pk):
     act = get_object_or_404(Act, pk=pk)
     act_types = ActType.objects.all()
     return render(request, "acts/edit.html", {"act": act, "act_types": act_types})
 
-
+@login_required(login_url="login")
 def act_update(request, pk):
     act = get_object_or_404(Act, pk=pk)
     if request.method == "POST":
@@ -334,7 +335,7 @@ def act_update(request, pk):
         act.save()
         return redirect("acts.index")
 
-
+@login_required(login_url="login")
 def act_destroy(request, pk):
     act = get_object_or_404(Act, pk=pk)
     act.delete()
@@ -354,21 +355,21 @@ def generate_medicine_code():
     code_number = int(last_code.split("-")[-1]) + 1
     return f"MDCN-{code_number:03}"
 
-
+@login_required(login_url="login")
 def medicine_index(request):
     medicines = Medicine.objects.all()
     return render(request, "medicines/index.html", {"medicines": medicines})
 
-
+@login_required(login_url="login")
 def medicine_show(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     return render(request, "medicines/show.html", {"medicine": medicine})
 
-
+@login_required(login_url="login")
 def medicine_create(request):
     return render(request, "medicines/create.html")
 
-
+@login_required(login_url="login")
 def medicine_store(request):
     if request.method == "POST":
         libelle = request.POST.get("libelle")
@@ -382,12 +383,12 @@ def medicine_store(request):
         Medicine.objects.create(code=code, libelle=libelle)
         return redirect("medicines.index")
 
-
+@login_required(login_url="login")
 def medicine_edit(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     return render(request, "medicines/edit.html", {"medicine": medicine})
 
-
+@login_required(login_url="login")
 def medicine_update(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     if request.method == "POST":
@@ -401,7 +402,7 @@ def medicine_update(request, pk):
         medicine.save()
         return redirect("medicines.index")
 
-
+@login_required(login_url="login")
 def medicine_destroy(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     medicine.delete()
@@ -435,14 +436,12 @@ def consultation_create(request):
         patient_id = request.POST.get("patient")
         act_id = request.POST.get("act")
 
-        # Generate unique codes
         consultation_code = generate_consultation_code()
         detail_code = generate_consultation_detail_code()
 
         patient = get_object_or_404(Patient, pk=patient_id)
         act = get_object_or_404(Act, pk=act_id)
 
-        # Ensure request.user is an instance of your custom User model
         doctor = get_object_or_404(User, pk=request.user.pk)
 
         consultation = Consultation.objects.create(
