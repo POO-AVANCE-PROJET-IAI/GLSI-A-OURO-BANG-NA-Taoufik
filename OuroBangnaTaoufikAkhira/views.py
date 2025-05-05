@@ -22,6 +22,7 @@ from django.template.loader import render_to_string
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
+from django.db import models
 
 
 def index(request):
@@ -31,10 +32,55 @@ def index(request):
 # ========================================
 # =============== Login ==================
 # ========================================
+
 @login_required(login_url="login")
 def home(request):
-    return render(request, "home.html")
-
+    total_patients = Patient.objects.count()
+    
+    total_consultations = Consultation.objects.count()
+    recent_consultations = Consultation.objects.order_by('-date')[:5]
+    
+    today = timezone.now().date()
+    today_consultations = Consultation.objects.filter(date=today).count()
+    
+    total_invoices = Invoice.objects.count()
+    paid_invoices = Invoice.objects.filter(status=True).count()
+    unpaid_invoices = Invoice.objects.filter(status=False).count()
+    
+    payment_rate = 0
+    if total_invoices > 0:
+        payment_rate = (paid_invoices / total_invoices) * 100
+    
+    total_revenue = Invoice.objects.filter(status=True).aggregate(models.Sum('amount'))['amount__sum'] or 0
+    
+    popular_acts = ConsultationDetails.objects.values('act__libelle').annotate(
+        count=models.Count('act')
+    ).order_by('-count')[:5]
+    
+    popular_medicines = OrderDelails.objects.values('medicine__libelle').annotate(
+        count=models.Count('medicine')
+    ).order_by('-count')[:5]
+    
+    doctor_consultations = 0
+    if not request.user.is_superuser:
+        doctor_consultations = Consultation.objects.filter(doctor=request.user).count()
+    
+    context = {
+        'total_patients': total_patients,
+        'total_consultations': total_consultations,
+        'recent_consultations': recent_consultations,
+        'today_consultations': today_consultations,
+        'total_invoices': total_invoices,
+        'paid_invoices': paid_invoices,
+        'unpaid_invoices': unpaid_invoices,
+        'payment_rate': round(payment_rate, 2),
+        'total_revenue': total_revenue,
+        'popular_acts': popular_acts,
+        'popular_medicines': popular_medicines,
+        'doctor_consultations': doctor_consultations,
+    }
+    
+    return render(request, "home.html", context)
 
 def login_view(request):
     if request.user.is_authenticated:
