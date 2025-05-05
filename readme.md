@@ -33,7 +33,7 @@ Avant de démarrer, assure-toi d’avoir installé :
 
 1. **Cloner le projet**
    ```bash
-   git clone https://github.com/ton-utilisateur/heart-pirates.git
+   git clone [https://github.com/ton-utilisateur/heart-pirates.git](https://github.com/POO-AVANCE-PROJET-IAI/GLSI-A-OURO-BANG-NA-Taoufik.git)
    cd heart-pirates
    ```
 
