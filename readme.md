@@ -1,7 +1,7 @@
-
 # 🏴‍☠️ Heart Pirates
 
 **Heart Pirates** est une application médicale web développée avec **Django**. Elle permet de :
+
 - Gérer des patients
 - Enregistrer des consultations
 - Émettre des ordonnances et factures
@@ -32,12 +32,14 @@ Avant de démarrer, assure-toi d’avoir installé :
 ## 🛠️ Installation
 
 1. **Cloner le projet**
+
    ```bash
    git clone https://github.com/POO-AVANCE-PROJET-IAI/GLSI-A-OURO-BANG-NA-Taoufik.git
    cd GLSI-A-OURO-BANG-NA-Taoufik
    ```
 
 2. **Créer un environnement virtuel**
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # Linux/macOS
@@ -47,7 +49,9 @@ Avant de démarrer, assure-toi d’avoir installé :
 3. **Installer les dépendances**
 
    ```bash
-   pip install django mysqlclient xhtml2pdf
+   pip install django mysqlclient
+   pip install playwright
+   python -m playwright install
    ```
 
 4. **Configurer la base de données**
@@ -69,6 +73,7 @@ Avant de démarrer, assure-toi d’avoir installé :
    ```
 
 5. **Appliquer les migrations**
+
    ```bash
    python manage.py makemigrations
    python manage.py migrate
@@ -117,10 +122,11 @@ Avant de démarrer, assure-toi d’avoir installé :
 
 ## 📄 Génération de PDF
 
-L’application utilise `xhtml2pdf` pour générer les ordonnances et factures en PDF. Assure-toi que cette bibliothèque est bien installée :
+L’application utilise `playwright` pour générer les ordonnances et factures en PDF. Assure-toi que cette bibliothèque est bien installée :
 
 ```bash
-pip install xhtml2pdf
+pip install playwright
+python -m playwright install
 ```
 
 ---
@@ -135,4 +141,3 @@ pip install xhtml2pdf
 ## 👤 Auteur
 
 Développé par Taoufik OURO-BANG'NA.
-

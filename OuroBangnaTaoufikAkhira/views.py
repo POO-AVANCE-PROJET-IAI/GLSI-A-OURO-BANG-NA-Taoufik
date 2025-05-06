@@ -24,6 +24,11 @@ from xhtml2pdf import pisa
 from io import BytesIO
 from django.db import models
 
+# pour le rendu pdf
+import asyncio
+from django.shortcuts import get_object_or_404
+from playwright.async_api import async_playwright
+
 
 def index(request):
     return render(request, "index.html")
@@ -33,54 +38,65 @@ def index(request):
 # =============== Login ==================
 # ========================================
 
+
 @login_required(login_url="login")
 def home(request):
     total_patients = Patient.objects.count()
-    
+
     total_consultations = Consultation.objects.count()
-    recent_consultations = Consultation.objects.order_by('-date')[:5]
-    
+    recent_consultations = Consultation.objects.order_by("-date")[:5]
+
     today = timezone.now().date()
     today_consultations = Consultation.objects.filter(date=today).count()
-    
+
     total_invoices = Invoice.objects.count()
     paid_invoices = Invoice.objects.filter(status=True).count()
     unpaid_invoices = Invoice.objects.filter(status=False).count()
-    
+
     payment_rate = 0
     if total_invoices > 0:
         payment_rate = (paid_invoices / total_invoices) * 100
-    
-    total_revenue = Invoice.objects.filter(status=True).aggregate(models.Sum('amount'))['amount__sum'] or 0
-    
-    popular_acts = ConsultationDetails.objects.values('act__libelle').annotate(
-        count=models.Count('act')
-    ).order_by('-count')[:5]
-    
-    popular_medicines = OrderDelails.objects.values('medicine__libelle').annotate(
-        count=models.Count('medicine')
-    ).order_by('-count')[:5]
-    
+
+    total_revenue = (
+        Invoice.objects.filter(status=True).aggregate(models.Sum("amount"))[
+            "amount__sum"
+        ]
+        or 0
+    )
+
+    popular_acts = (
+        ConsultationDetails.objects.values("act__libelle")
+        .annotate(count=models.Count("act"))
+        .order_by("-count")[:5]
+    )
+
+    popular_medicines = (
+        OrderDelails.objects.values("medicine__libelle")
+        .annotate(count=models.Count("medicine"))
+        .order_by("-count")[:5]
+    )
+
     doctor_consultations = 0
     if not request.user.is_superuser:
         doctor_consultations = Consultation.objects.filter(doctor=request.user).count()
-    
+
     context = {
-        'total_patients': total_patients,
-        'total_consultations': total_consultations,
-        'recent_consultations': recent_consultations,
-        'today_consultations': today_consultations,
-        'total_invoices': total_invoices,
-        'paid_invoices': paid_invoices,
-        'unpaid_invoices': unpaid_invoices,
-        'payment_rate': round(payment_rate, 2),
-        'total_revenue': total_revenue,
-        'popular_acts': popular_acts,
-        'popular_medicines': popular_medicines,
-        'doctor_consultations': doctor_consultations,
+        "total_patients": total_patients,
+        "total_consultations": total_consultations,
+        "recent_consultations": recent_consultations,
+        "today_consultations": today_consultations,
+        "total_invoices": total_invoices,
+        "paid_invoices": paid_invoices,
+        "unpaid_invoices": unpaid_invoices,
+        "payment_rate": round(payment_rate, 2),
+        "total_revenue": total_revenue,
+        "popular_acts": popular_acts,
+        "popular_medicines": popular_medicines,
+        "doctor_consultations": doctor_consultations,
     }
-    
+
     return render(request, "home.html", context)
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -103,6 +119,7 @@ def login_view(request):
 
     return render(request, "auth/login.html")
 
+
 @login_required(login_url="login")
 def logout_view(request):
     logout(request)
@@ -117,14 +134,17 @@ def patient_index(request):
     patients = Patient.objects.all()
     return render(request, "patient/index.html", {"patients": patients})
 
+
 @login_required(login_url="login")
 def patient_show(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     return render(request, "patient/show.html", {"patient": patient})
 
+
 @login_required(login_url="login")
 def patient_create(request):
     return render(request, "patient/create.html")
+
 
 @login_required(login_url="login")
 def patient_store(request):
@@ -160,10 +180,12 @@ def patient_store(request):
         )
         return redirect("patients.index")
 
+
 @login_required(login_url="login")
 def patient_edit(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     return render(request, "patient/edit.html", {"patient": patient})
+
 
 @login_required(login_url="login")
 def patient_update(request, pk):
@@ -199,6 +221,7 @@ def patient_update(request, pk):
         patient.save()
         return redirect("patients.index")
 
+
 @login_required(login_url="login")
 def patient_destroy(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
@@ -219,19 +242,23 @@ def generate_acttype_code():
     code_number = int(last_code.split("-")[-1]) + 1
     return f"T-ACT-{code_number:03}"
 
+
 @login_required(login_url="login")
 def acttype_index(request):
     acttypes = ActType.objects.all()
     return render(request, "acttypes/index.html", {"acttypes": acttypes})
+
 
 @login_required(login_url="login")
 def acttype_show(request, pk):
     acttype = get_object_or_404(ActType, pk=pk)
     return render(request, "acttypes/show.html", {"acttype": acttype})
 
+
 @login_required(login_url="login")
 def acttype_create(request):
     return render(request, "acttypes/create.html")
+
 
 @login_required(login_url="login")
 def acttype_store(request):
@@ -246,10 +273,12 @@ def acttype_store(request):
         ActType.objects.create(code=code, libelle=libelle)
         return redirect("acttypes.index")
 
+
 @login_required(login_url="login")
 def acttype_edit(request, pk):
     acttype = get_object_or_404(ActType, pk=pk)
     return render(request, "acttypes/edit.html", {"acttype": acttype})
+
 
 @login_required(login_url="login")
 def acttype_update(request, pk):
@@ -259,6 +288,7 @@ def acttype_update(request, pk):
         acttype.libelle = libelle
         acttype.save()
         return redirect("acttypes.index")
+
 
 @login_required(login_url="login")
 def acttype_destroy(request, pk):
@@ -278,20 +308,24 @@ def generate_act_code():
     code_number = int(last_code.split("-")[-1]) + 1
     return f"ACT-{code_number:03}"
 
+
 @login_required(login_url="login")
 def act_index(request):
     acts = Act.objects.all()
     return render(request, "acts/index.html", {"acts": acts})
+
 
 @login_required(login_url="login")
 def act_show(request, pk):
     act = get_object_or_404(Act, pk=pk)
     return render(request, "acts/show.html", {"act": act})
 
+
 @login_required(login_url="login")
 def act_create(request):
     act_types = ActType.objects.all()
     return render(request, "acts/create.html", {"act_types": act_types})
+
 
 @login_required(login_url="login")
 def act_store(request):
@@ -310,11 +344,13 @@ def act_store(request):
         Act.objects.create(code=code, libelle=libelle, amount=amount, act_type=act_type)
         return redirect("acts.index")
 
+
 @login_required(login_url="login")
 def act_edit(request, pk):
     act = get_object_or_404(Act, pk=pk)
     act_types = ActType.objects.all()
     return render(request, "acts/edit.html", {"act": act, "act_types": act_types})
+
 
 @login_required(login_url="login")
 def act_update(request, pk):
@@ -334,6 +370,7 @@ def act_update(request, pk):
         act.act_type = act_type
         act.save()
         return redirect("acts.index")
+
 
 @login_required(login_url="login")
 def act_destroy(request, pk):
@@ -355,19 +392,23 @@ def generate_medicine_code():
     code_number = int(last_code.split("-")[-1]) + 1
     return f"MDCN-{code_number:03}"
 
+
 @login_required(login_url="login")
 def medicine_index(request):
     medicines = Medicine.objects.all()
     return render(request, "medicines/index.html", {"medicines": medicines})
+
 
 @login_required(login_url="login")
 def medicine_show(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     return render(request, "medicines/show.html", {"medicine": medicine})
 
+
 @login_required(login_url="login")
 def medicine_create(request):
     return render(request, "medicines/create.html")
+
 
 @login_required(login_url="login")
 def medicine_store(request):
@@ -383,10 +424,12 @@ def medicine_store(request):
         Medicine.objects.create(code=code, libelle=libelle)
         return redirect("medicines.index")
 
+
 @login_required(login_url="login")
 def medicine_edit(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     return render(request, "medicines/edit.html", {"medicine": medicine})
+
 
 @login_required(login_url="login")
 def medicine_update(request, pk):
@@ -401,6 +444,7 @@ def medicine_update(request, pk):
         medicine.libelle = libelle
         medicine.save()
         return redirect("medicines.index")
+
 
 @login_required(login_url="login")
 def medicine_destroy(request, pk):
@@ -600,11 +644,20 @@ def invoice_update(request, pk):
     return render(request, "invoices/edit.html", {"invoice": invoice})
 
 
+async def render_pdf_from_html(html_content):
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
+        await page.set_content(html_content)
+        pdf_bytes = await page.pdf(format="A4", print_background=True)
+        await browser.close()
+        return pdf_bytes
+
+
 @login_required(login_url="login")
 def invoice_pdf(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
     details = InvoiceDetails.objects.filter(invoice=invoice)
-
     consultation = Consultation.objects.filter(invoice=invoice).first()
 
     template = get_template("invoices/pdf_template.html")
@@ -616,22 +669,12 @@ def invoice_pdf(request, pk):
         }
     )
 
-    buffer = BytesIO()
+    pdf = asyncio.run(render_pdf_from_html(html))
 
-    pisa_status = pisa.CreatePDF(
-        html,
-        dest=buffer,
-    )
-
-    if pisa_status.err:
-        return HttpResponse("We had some errors with code %s" % pisa_status.err)
-
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type="application/pdf")
+    response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = (
         f'attachment; filename="invoice_{invoice.code}.pdf"'
     )
-
     return response
 
 
@@ -772,20 +815,10 @@ def order_pdf(request, pk):
         }
     )
 
-    buffer = BytesIO()
+    pdf = asyncio.run(render_pdf_from_html(html))
 
-    pisa_status = pisa.CreatePDF(
-        html,
-        dest=buffer,
-    )
-
-    if pisa_status.err:
-        return HttpResponse("We had some errors with code %s" % pisa_status.err)
-
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type="application/pdf")
+    response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = (
         f'attachment; filename="prescription_{order.code}.pdf"'
     )
-
     return response
